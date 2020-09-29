@@ -2,17 +2,18 @@ const CACHE_NAME = "static-cache-v2";
 const DATA_CACHE_NAME = "data-cache-v1";
 const FILES_TO_CACHE = [
   "/",
-  "/index.html",
-  "db.js",
+  "/db.js",
+  "/index.js",
   "/manifest.webmanifest",
   "/icons/icon_192x192.png",
   "/icons/icon_512x512.png",
-  "/index.js",
   "/styles.css",
+  "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
+  "https://cdn.jsdelivr.net/npm/chart.js@2.8.0"
 ];
 
 // install
-self.addEventListener("install", function(evt) {
+self.addEventListener("install", evt => {
     evt.waitUntil(
       caches.open(CACHE_NAME).then(cache => {
         console.log("Your files were pre-cached successfully!");
@@ -24,7 +25,7 @@ self.addEventListener("install", function(evt) {
   });
 
 // activate
-self.addEventListener("activate", function(evt) {
+self.addEventListener("activate", evt => {
   evt.waitUntil(
     caches.keys().then(keyList => {
       return Promise.all(
@@ -42,7 +43,7 @@ self.addEventListener("activate", function(evt) {
 });
 
 // fetch
-self.addEventListener("fetch", function(evt) {
+self.addEventListener("fetch", evt => {
   if (evt.request.url.includes("/api/")) {
     evt.respondWith(
       caches.open(DATA_CACHE_NAME).then(cache => {
@@ -57,6 +58,7 @@ self.addEventListener("fetch", function(evt) {
           })
           .catch(err => {
             // Network request failed, try to get it from the cache.
+            console.log(evt.request)
             return cache.match(evt.request);
           });
       }).catch(err => console.log(err))
